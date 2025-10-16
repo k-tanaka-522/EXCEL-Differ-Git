@@ -1,4 +1,8 @@
-"""Excel diff detection algorithm."""
+"""Excel差分検出アルゴリズム
+
+行単位の内容ベース比較を実装。
+行の挿入・削除があっても、実際の変更のみを正確に抽出します。
+"""
 
 from typing import List, Dict, Set, Tuple, Optional
 from dataclasses import dataclass
@@ -7,33 +11,33 @@ from .excel_reader import ExcelRow, ExcelSheet, ExcelWorkbook
 
 
 class ChangeType(Enum):
-    """Types of changes detected."""
-    ADDED = "added"
-    DELETED = "deleted"
-    MODIFIED = "modified"
-    SHEET_ADDED = "sheet_added"
-    SHEET_DELETED = "sheet_deleted"
+    """変更タイプの列挙"""
+    ADDED = "added"          # 追加
+    DELETED = "deleted"      # 削除
+    MODIFIED = "modified"    # 変更
+    SHEET_ADDED = "sheet_added"      # シート追加
+    SHEET_DELETED = "sheet_deleted"  # シート削除
 
 
 @dataclass
 class CellChange:
-    """Represents a change in a single cell."""
-    column_index: int
-    column_letter: str
-    old_value: Optional[str]
-    new_value: Optional[str]
+    """セルの変更を表すクラス"""
+    column_index: int           # 列インデックス（0始まり）
+    column_letter: str          # 列文字（A, B, C...）
+    old_value: Optional[str]    # 変更前の値
+    new_value: Optional[str]    # 変更後の値
 
 
 @dataclass
 class RowChange:
-    """Represents a change in a row."""
-    change_type: ChangeType
-    sheet_name: str
-    old_row_number: Optional[int]
-    new_row_number: Optional[int]
-    old_row: Optional[ExcelRow]
-    new_row: Optional[ExcelRow]
-    cell_changes: List[CellChange]
+    """行の変更を表すクラス"""
+    change_type: ChangeType              # 変更タイプ
+    sheet_name: str                      # シート名
+    old_row_number: Optional[int]        # 変更前の行番号
+    new_row_number: Optional[int]        # 変更後の行番号
+    old_row: Optional[ExcelRow]          # 変更前の行データ
+    new_row: Optional[ExcelRow]          # 変更後の行データ
+    cell_changes: List[CellChange]       # セル単位の変更リスト
 
     def __repr__(self) -> str:
         row_num = self.new_row_number or self.old_row_number
@@ -42,21 +46,21 @@ class RowChange:
 
 @dataclass
 class SheetChange:
-    """Represents a change in a sheet."""
-    change_type: ChangeType
-    sheet_name: str
-    row_changes: List[RowChange]
+    """シートの変更を表すクラス"""
+    change_type: ChangeType           # 変更タイプ
+    sheet_name: str                   # シート名
+    row_changes: List[RowChange]      # 行単位の変更リスト
 
 
 @dataclass
 class WorkbookDiff:
-    """Represents the complete diff between two workbooks."""
-    old_file: str
-    new_file: str
-    sheet_changes: List[SheetChange]
+    """ブック全体の差分を表すクラス"""
+    old_file: str                     # 変更前のファイル名
+    new_file: str                     # 変更後のファイル名
+    sheet_changes: List[SheetChange]  # シート単位の変更リスト
 
     def get_summary(self) -> Dict[str, int]:
-        """Get summary statistics of changes."""
+        """変更の統計情報を取得"""
         summary = {
             "sheets_added": 0,
             "sheets_deleted": 0,
@@ -87,9 +91,9 @@ class WorkbookDiff:
 
 
 def column_index_to_letter(index: int) -> str:
-    """Convert column index (0-based) to Excel column letter."""
+    """列インデックス（0始まり）をExcel列文字（A, B, ...）に変換"""
     letter = ""
-    index += 1  # Convert to 1-based
+    index += 1  # 1始まりに変換
     while index > 0:
         index -= 1
         letter = chr(index % 26 + ord('A')) + letter
@@ -98,17 +102,17 @@ def column_index_to_letter(index: int) -> str:
 
 
 def find_row_matches(old_rows: List[ExcelRow], new_rows: List[ExcelRow]) -> Tuple[
-    Dict[int, int],  # old_idx -> new_idx (exact matches)
-    Set[int],  # unmatched old indices
-    Set[int],  # unmatched new indices
+    Dict[int, int],  # old_idx -> new_idx (完全一致)
+    Set[int],        # 一致しなかった旧行のインデックス
+    Set[int],        # 一致しなかった新行のインデックス
 ]:
     """
-    Find matching rows between old and new sheets using content-based comparison.
+    内容ベースの比較で行のマッチングを検出
 
     Returns:
-        Tuple of (matches_dict, unmatched_old_indices, unmatched_new_indices)
+        (マッチング辞書, 未一致の旧行, 未一致の新行) のタプル
     """
-    # Create content hash to indices mapping
+    # 内容のハッシュからインデックスへのマッピングを作成
     old_content_map: Dict[str, List[int]] = {}
     new_content_map: Dict[str, List[int]] = {}
 
@@ -124,7 +128,7 @@ def find_row_matches(old_rows: List[ExcelRow], new_rows: List[ExcelRow]) -> Tupl
             new_content_map[content] = []
         new_content_map[content].append(idx)
 
-    # Find exact matches
+    # 完全一致する行を検出
     matches = {}
     matched_old = set()
     matched_new = set()
@@ -132,7 +136,7 @@ def find_row_matches(old_rows: List[ExcelRow], new_rows: List[ExcelRow]) -> Tupl
     for content, old_indices in old_content_map.items():
         if content in new_content_map:
             new_indices = new_content_map[content]
-            # Match rows one-to-one
+            # 行を1対1でマッチング
             for old_idx, new_idx in zip(old_indices, new_indices):
                 matches[old_idx] = new_idx
                 matched_old.add(old_idx)
@@ -147,11 +151,12 @@ def find_row_matches(old_rows: List[ExcelRow], new_rows: List[ExcelRow]) -> Tupl
 def find_similar_rows(old_rows: List[ExcelRow], new_rows: List[ExcelRow],
                      unmatched_old: Set[int], unmatched_new: Set[int]) -> List[Tuple[int, int]]:
     """
-    Find similar rows that might be modifications.
-    Uses simple similarity heuristic: at least one cell matches.
+    類似した行（変更の可能性）を検出
+
+    50%以上のセルが一致する行を「変更」とみなします。
 
     Returns:
-        List of (old_idx, new_idx) pairs
+        (旧行インデックス, 新行インデックス) のペアのリスト
     """
     similar_pairs = []
 
@@ -163,7 +168,7 @@ def find_similar_rows(old_rows: List[ExcelRow], new_rows: List[ExcelRow],
         for new_idx in unmatched_new:
             new_row = new_rows[new_idx]
 
-            # Simple similarity: count matching cells
+            # 類似度計算: 一致するセルの数をカウント
             max_len = max(len(old_row.cells), len(new_row.cells))
             if max_len == 0:
                 continue
@@ -175,7 +180,7 @@ def find_similar_rows(old_rows: List[ExcelRow], new_rows: List[ExcelRow],
 
             score = matching_cells / max_len
 
-            # Require at least 50% similarity to consider it a modification
+            # 50%以上の類似度で「変更」とみなす
             if score >= 0.5 and score > best_score:
                 best_score = score
                 best_match = new_idx
@@ -187,7 +192,7 @@ def find_similar_rows(old_rows: List[ExcelRow], new_rows: List[ExcelRow],
 
 
 def detect_cell_changes(old_row: ExcelRow, new_row: ExcelRow) -> List[CellChange]:
-    """Detect which cells changed between two rows."""
+    """2つの行間でどのセルが変更されたかを検出"""
     changes = []
     max_len = max(len(old_row.cells), len(new_row.cells))
 
@@ -208,20 +213,20 @@ def detect_cell_changes(old_row: ExcelRow, new_row: ExcelRow) -> List[CellChange
 
 def diff_sheets(old_sheet: ExcelSheet, new_sheet: ExcelSheet) -> List[RowChange]:
     """
-    Compare two sheets and detect row-level changes.
+    2つのシートを比較して行レベルの変更を検出
 
     Returns:
-        List of RowChange objects
+        RowChangeオブジェクトのリスト
     """
     row_changes = []
 
-    # Find exact matches
+    # 完全一致する行を検出
     matches, unmatched_old, unmatched_new = find_row_matches(old_sheet.rows, new_sheet.rows)
 
-    # Find similar rows (potential modifications)
+    # 類似した行（変更の可能性）を検出
     similar_pairs = find_similar_rows(old_sheet.rows, new_sheet.rows, unmatched_old, unmatched_new)
 
-    # Process modifications
+    # 変更された行を処理
     for old_idx, new_idx in similar_pairs:
         old_row = old_sheet.rows[old_idx]
         new_row = new_sheet.rows[new_idx]
@@ -240,7 +245,7 @@ def diff_sheets(old_sheet: ExcelSheet, new_sheet: ExcelSheet) -> List[RowChange]
         unmatched_old.discard(old_idx)
         unmatched_new.discard(new_idx)
 
-    # Process deletions
+    # 削除された行を処理
     for old_idx in sorted(unmatched_old):
         old_row = old_sheet.rows[old_idx]
         row_changes.append(RowChange(
@@ -253,7 +258,7 @@ def diff_sheets(old_sheet: ExcelSheet, new_sheet: ExcelSheet) -> List[RowChange]
             cell_changes=[],
         ))
 
-    # Process additions
+    # 追加された行を処理
     for new_idx in sorted(unmatched_new):
         new_row = new_sheet.rows[new_idx]
         row_changes.append(RowChange(
@@ -271,21 +276,21 @@ def diff_sheets(old_sheet: ExcelSheet, new_sheet: ExcelSheet) -> List[RowChange]
 
 def diff_workbooks(old_wb: ExcelWorkbook, new_wb: ExcelWorkbook) -> WorkbookDiff:
     """
-    Compare two Excel workbooks and detect all changes.
+    2つのExcelブックを比較してすべての変更を検出
 
     Args:
-        old_wb: Old version of the workbook
-        new_wb: New version of the workbook
+        old_wb: 変更前のワークブック
+        new_wb: 変更後のワークブック
 
     Returns:
-        WorkbookDiff object containing all detected changes
+        検出されたすべての変更を含むWorkbookDiffオブジェクト
     """
     sheet_changes = []
 
     old_sheet_names = set(old_wb.sheets.keys())
     new_sheet_names = set(new_wb.sheets.keys())
 
-    # Deleted sheets
+    # 削除されたシート
     for sheet_name in sorted(old_sheet_names - new_sheet_names):
         sheet_changes.append(SheetChange(
             change_type=ChangeType.SHEET_DELETED,
@@ -293,7 +298,7 @@ def diff_workbooks(old_wb: ExcelWorkbook, new_wb: ExcelWorkbook) -> WorkbookDiff
             row_changes=[],
         ))
 
-    # Added sheets
+    # 追加されたシート
     for sheet_name in sorted(new_sheet_names - old_sheet_names):
         sheet_changes.append(SheetChange(
             change_type=ChangeType.SHEET_ADDED,
@@ -301,14 +306,14 @@ def diff_workbooks(old_wb: ExcelWorkbook, new_wb: ExcelWorkbook) -> WorkbookDiff
             row_changes=[],
         ))
 
-    # Modified sheets (sheets present in both)
+    # 変更されたシート（両方に存在するシート）
     for sheet_name in sorted(old_sheet_names & new_sheet_names):
         old_sheet = old_wb.sheets[sheet_name]
         new_sheet = new_wb.sheets[sheet_name]
 
         row_changes = diff_sheets(old_sheet, new_sheet)
 
-        if row_changes:  # Only include sheets with changes
+        if row_changes:  # 変更があるシートのみ含める
             sheet_changes.append(SheetChange(
                 change_type=ChangeType.MODIFIED,
                 sheet_name=sheet_name,

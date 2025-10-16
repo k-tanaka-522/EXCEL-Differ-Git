@@ -4,7 +4,14 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Excel Differ Git tool\n\n- Git統合されたExcel差分表示ツール\n- 行単位の内容ベース比較アルゴリズム実装\n- テキスト/CSV出力形式サポート\n- CLI実装完了\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Excel Differ Git tool\n\n- Git統合されたExcel差分表示ツール\n- 行単位の内容ベース比較アルゴリズム実装\n- テキスト/CSV出力形式サポート\n- CLI実装完了\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(python create_test_excel.py:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(where:*)",
+      "Bash(py:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Windows環境対応とテスト実装\n\n- Windows環境での文字エンコーディング問題を修正\n- 特殊文字（矢印）をASCII文字に変更\n- テスト用Excelファイル作成スクリプト追加\n- 差分検出アルゴリズムに日本語コメント追加\n- 動作確認完了（直接ファイル比較、CSV出力）\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

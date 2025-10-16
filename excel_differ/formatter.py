@@ -21,7 +21,7 @@ class TextFormatter:
         """
         output.write("=" * 70 + "\n")
         output.write(f"Excel Diff: {diff.new_file}\n")
-        output.write(f"Comparing: {diff.old_file} ⟷ {diff.new_file}\n")
+        output.write(f"Comparing: {diff.old_file} <-> {diff.new_file}\n")
         output.write("=" * 70 + "\n\n")
 
         if not diff.sheet_changes:
@@ -94,7 +94,7 @@ class TextFormatter:
 
             for cell_change in row_change.cell_changes:
                 output.write(f"    Column {cell_change.column_letter}: ")
-                output.write(f'"{cell_change.old_value}" → "{cell_change.new_value}"\n')
+                output.write(f'"{cell_change.old_value}" -> "{cell_change.new_value}"\n')
 
 
 class CSVFormatter:
