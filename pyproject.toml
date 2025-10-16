@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "excel-differ"
+version = "0.1.0"
+description = "Git-integrated Excel diff tool for tracking changes in Excel files"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "openpyxl>=3.1.0",
+    "GitPython>=3.1.0",
+    "click>=8.1.0",
+]
+
+[project.scripts]
+excel-diff = "excel_differ.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+]
