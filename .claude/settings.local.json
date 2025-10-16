@@ -11,7 +11,12 @@
       "Bash(python -m pip install:*)",
       "Bash(where:*)",
       "Bash(py:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Windows環境対応とテスト実装\n\n- Windows環境での文字エンコーディング問題を修正\n- 特殊文字（矢印）をASCII文字に変更\n- テスト用Excelファイル作成スクリプト追加\n- 差分検出アルゴリズムに日本語コメント追加\n- 動作確認完了（直接ファイル比較、CSV出力）\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Windows環境対応とテスト実装\n\n- Windows環境での文字エンコーディング問題を修正\n- 特殊文字（矢印）をASCII文字に変更\n- テスト用Excelファイル作成スクリプト追加\n- 差分検出アルゴリズムに日本語コメント追加\n- 動作確認完了（直接ファイル比較、CSV出力）\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(dir:*)",
+      "Bash(timeout 30 echo:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(findstr:*)",
+      "Bash(cmd /c \"move create_test_excel.py test\\ && move create_medium_test.py test\\ && move create_large_test.py test\\ && move test_config_*.xlsx test\\ && move medium_test_*.xlsx test\\ && move medium_test_*.txt test\\ && move medium_test_*.csv test\"\" 2>nul || echo \"Files moved \")"
     ],
     "deny": [],
     "ask": []

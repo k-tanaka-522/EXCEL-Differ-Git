@@ -39,3 +39,12 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test files (large Excel files)
+test/large_test_*.xlsx
+test/*_test_*.xlsx
+test/*.csv
+test/*.txt
+
+# Temporary files
+nul

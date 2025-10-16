@@ -1,6 +1,0 @@
-type,sheet,old_row,new_row,column,cell,old_value,new_value,description
-sheet_added,アラート設定,,,,,,,Sheet added
-cell_modified,基本設定,3,3,B,B3,8080,8081,Cell modified
-cell_modified,監視設定,3,4,C,C4,90,85,Cell modified
-row_deleted,監視設定,4,,,,MON_003|ディスク使用率|95,,Row deleted
-row_added,監視設定,,3,,,,MON_004|ネットワーク|100,Row added
