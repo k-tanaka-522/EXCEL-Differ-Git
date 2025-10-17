@@ -48,3 +48,6 @@ test/*.txt
 
 # Temporary files
 nul
+
+# Offline install dependencies
+vendor/
