@@ -58,9 +58,22 @@ chmod +x install_offline.sh
 
 ## 使い方
 
+### 前提知識
+
+**インストール先と使用場所の違い:**
+- **Excel Differ Git のインストール**: どこでも1回だけ（例: `C:\tools\ExcelDifferGit`）
+- **excel-diff コマンドの実行**: あなたのプロジェクトのGitリポジトリ内で実行
+
+インストール後は、`excel-diff` コマンドがシステム全体で使えるようになります。
+
 ### Git統合モード
 
+**重要**: Git統合モードを使う場合は、**Excelファイルが含まれるGitリポジトリのディレクトリ内**でコマンドを実行してください。
+
 ```bash
+# 例: あなたのプロジェクトのGitリポジトリに移動
+cd /path/to/your-project
+
 # 最新コミットと1つ前のコミットを比較（デフォルト）
 excel-diff myfile.xlsx
 
@@ -73,11 +86,27 @@ excel-diff --working-tree myfile.xlsx
 excel-diff --from HEAD~1 --working-tree myfile.xlsx
 ```
 
+**使用例:**
+```bash
+# 設定管理リポジトリで使う場合
+cd ~/config-repo
+excel-diff config.xlsx  # Gitの履歴から差分を表示
+
+# ドキュメント管理リポジトリで使う場合
+cd ~/docs-repo
+excel-diff --working-tree report.xlsx  # 未コミットの変更を表示
+```
+
 ### ファイル直接比較モード
 
+Gitリポジトリ外でも、2つのExcelファイルを直接比較できます。
+
 ```bash
-# 2つのExcelファイルを直接比較
+# 2つのExcelファイルを直接比較（どこからでも実行可能）
 excel-diff --old old_version.xlsx --new new_version.xlsx old_version.xlsx
+
+# 例: バックアップファイルと最新ファイルを比較
+excel-diff --old backup/config_20250101.xlsx --new config.xlsx config.xlsx
 ```
 
 ### 出力形式
