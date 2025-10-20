@@ -48,3 +48,7 @@ test/*.txt
 
 # Temporary files
 nul
+
+# Installation logs
+install_log.txt
+install_app_log.txt

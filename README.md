@@ -12,21 +12,35 @@ Git統合されたExcel差分表示ツール。Excelファイルの変更を行�
 
 ## インストール
 
+### 方法1: 簡単インストール（推奨）
+
 ```bash
 # リポジトリをクローンまたはZIPダウンロード
 git clone https://github.com/k-tanaka-522/EXCEL-Differ-Git.git
 cd EXCEL-Differ-Git
 
-# 依存関係をインストール（vendor/から）
-pip install --no-index --find-links=vendor -r requirements.txt
+# Windowsの場合
+install_offline.bat
 
-# 本体をインストール
-pip install -e .
+# Linux/Macの場合
+pip install --no-index --find-links=vendor -r requirements.txt
+pip install --no-index --find-links=vendor -e .
 ```
 
-**注意**:
+### 方法2: 手動インストール
+
+```bash
+# 依存関係をインストール（vendor/から）
+py -m pip install --no-index --find-links=vendor -r requirements.txt
+
+# 本体をインストール
+py -m pip install --no-index --find-links=vendor -e .
+```
+
+**重要**:
 - 必要なライブラリはすべて `vendor/` ディレクトリに含まれています
-- インターネット接続なしでインストール可能です
+- **完全オフライン**でインストール可能（インターネット接続不要）
+- `--no-index --find-links=vendor` を両方のコマンドで指定することでオフラインインストールが保証されます
 
 ## 使い方
 
